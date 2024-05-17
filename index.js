@@ -11,7 +11,10 @@ const port = process.env.PORT || 5000;
 // ==========middleware==========
 app.use(
   cors({
-    origin: ["http://localhost:5173","https://computer-accessories-shop-frontend.vercel.app"],
+    origin: [
+      "http://localhost:5173",
+      "https://computer-accessories-shop-frontend.vercel.app",
+    ],
     credentials: true,
   })
 );
@@ -28,14 +31,10 @@ const client = new MongoClient(uri, {
   },
 });
 
-
 // ssl commerz cresentials
 const store_id = process.env.storeID;
 const store_passwd = process.env.storePasswd;
 const is_live = false; //true for live, false for sandbox
-
-
-
 
 async function run() {
   try {
@@ -84,9 +83,6 @@ async function run() {
       next();
     };
 
-   
-
-    
     // post method for products
     app.post("/api/v1/products", async (req, res) => {
       const test = req.body;
@@ -97,7 +93,7 @@ async function run() {
       const item = req.body;
       console.log(item);
       const product = {
-        id:item._id,
+        id: item._id,
         name: item.name,
         brand: item.brand,
         model: item.model,
@@ -111,7 +107,7 @@ async function run() {
         tag: item.tag,
         images: item.images,
         email: item.email,
-        warranty: item.warranty
+        warranty: item.warranty,
       };
 
       const query = { id: item._id, email: item.email };
@@ -126,7 +122,7 @@ async function run() {
     app.post("/api/v1/wishlist", async (req, res) => {
       const item = req.body;
       const product = {
-        id:item._id,
+        id: item._id,
         name: item.name,
         brand: item.brand,
         model: item.model,
@@ -156,12 +152,11 @@ async function run() {
     });
 
     // -----
-    
-    
+
     app.post("/api/v1/payment", async (req, res) => {
       const tran_id = new ObjectId().toString();
       const id = new ObjectId().toString();
- 
+
       const cartItem = req.body;
       const info = {
         ...cartItem,
@@ -191,7 +186,7 @@ async function run() {
         cus_country: "Bangladesh",
         cus_phone: "01711111111",
         cus_fax: "01711111111",
-        ship_name: 'Customer Name',
+        ship_name: "Customer Name",
         ship_add1: "Dhaka",
         ship_add2: "Dhaka",
         ship_city: "Dhaka",
@@ -357,26 +352,36 @@ async function run() {
       const result = await products.updateOne(filter, updatedDoc);
       res.send(result);
     });
-    app.patch("/api/v1/offers", async (req, res) => {
+    app.patch("/api/v1/offers-text", async (req, res) => {
       const data = req.body;
-      const filter = { _id: new ObjectId("6635066cb684658033043d51") };
+      const filter = { _id: new ObjectId("66472aa6d941e3ad30045c8a") };
       const updatedDoc = {
         $set: {
-          // title:data.title,
-          // percentage:data.percentage,
-          // days:data.days,
-          // hours:data.hours,
-          // minutes:data.minutes,
-          // seconds:data.seconds,
+          title: data.title,
+          percentage: data.percentage,
+          days: data.days,
+          hours: data.hours,
+          minutes: data.minutes,
+          seconds: data.seconds,
+          display: data.display
           // products:data.products,
           // category:data.category,
+        },
+      };
+      const result = await offers.updateOne(filter, updatedDoc);
+      res.send(result);
+    });
+    app.patch("/api/v1/offers-products", async (req, res) => {
+      const data = req.body;
+      const filter = { _id: new ObjectId("66472aa6d941e3ad30045c8a") };
+      const updatedDoc = {
+        $set: {
           products: data.products,
         },
       };
       const result = await offers.updateOne(filter, updatedDoc);
       res.send(result);
     });
-
 
     // get methods
     app.get("/api/v1/products", async (req, res) => {
@@ -468,8 +473,9 @@ async function run() {
     });
     app.get("/api/v1/orders/:email", async (req, res) => {
       const email = req.params.email;
-      const query = { 
-        userEmail: email };
+      const query = {
+        userEmail: email,
+      };
       const result = await orders.find(query).toArray();
       res.send(result);
     });
@@ -483,13 +489,13 @@ async function run() {
       const result = await reviews.find(query).toArray();
       res.send(result);
     });
-    
+
     app.get("/api/v1/single/reviews/:id", async (req, res) => {
       const id = req.params.id;
-      const query = { productId:id };
+      const query = { productId: id };
       const result = await reviews.find(query).toArray();
       res.send(result);
-    }); 
+    });
     app.get("/api/v1/payments", async (req, res) => {
       const result = await payments.find().toArray();
       res.send(result);
