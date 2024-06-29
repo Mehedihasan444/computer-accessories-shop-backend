@@ -323,6 +323,7 @@ async function run() {
           email: data?.email,
           phone: data?.phone,
           image: data?.image,
+          address: data?.address,
         },
       };
       const result = await users.updateOne(filter, updatedDoc);
