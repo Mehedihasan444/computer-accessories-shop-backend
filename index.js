@@ -5,6 +5,8 @@ const SSLCommerzPayment = require("sslcommerz-lts");
 // const cookieParser=require('cookie-parser')
 require("dotenv").config();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const { default: generateDescription, upload } = require("./utils/AI_Description_Genarator");
+const { aiChatBot } = require("./utils/Ai_Chat_Bot");
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -262,6 +264,32 @@ async function run() {
       res.send(result);
     });
 
+    // image description generator
+    app.post("/api/v1/image-description", upload.single('image'), async (req, res) => {
+      const { prompt } = JSON.parse(req.body.data);
+      const image = req.file.path; // Get the path of the uploaded file
+      let description = null;
+      try {
+        description = await generateDescription(image, prompt);
+      } catch (error) {
+        console.error('Error:', error);
+        return res.status(500).send('Error generating description');
+      }
+      res.send(description);
+    });
+    // ai chat bot
+    app.post("/api/v1/ai-chat", async (req, res) => {
+      const { prompt } = req.body;
+      try {
+        const response = await aiChatBot(prompt);
+        res.send(response);
+
+      } catch (error) {
+        console.error('Error:', error);
+        return res.status(500).send('Error generating description');
+
+      }
+    });
     // delete methods
     app.delete("/api/v1/users/admin/:email", async (req, res) => {
       const email = req.params.email;
